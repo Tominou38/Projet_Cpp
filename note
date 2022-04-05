@@ -1,0 +1,22 @@
+CARACTERISTIQUES DE LA CARTE :
+
+
+    Alimentation:
+    - 5 Vcc via micro-USB
+    - 5 à 9 Vcc via broche Vin (régulateur intégré)
+    Microcontrôleur: ESP8266
+    Microprocesseur: Tensilica LX106
+    Fréquence: 80 MHz
+    Mémoire RAM: 64 kB
+    Mémoire Flash: 96 kB
+    10 E/S digitales compatibles PWM
+    Interfaces: I2C, SPI, UART
+    Interface Wifi 802.11 b/g/n 2,4 GHz
+    Antenne intégrée
+    Température de service: -40 à 125 °C
+    Dimensions: 58 x 31 x 12 mm
+    Version: 2
+
+
+Possibilité de peut etre utiliser notre Arduino Uno
+
