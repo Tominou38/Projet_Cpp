@@ -19,10 +19,26 @@ class BHP: public capteur {
     float Temp;
     float Press; 
   public : 
-    BHP(); 
-    BHP(float T, float P){
+    BHP():capteur("pression"){}; 
+    BHP(float T, float P):capteur("pression"){
       Temp=T;
       Press=P;
+    };
+
+    void setPress(){
+      Press=bmp.readPressure(); 
+    }
+
+    float getPress(){
+      return Press; 
+    }
+
+    void setTemp(){
+      Temp=bmp.readTemperature(); 
+    }
+
+    float getTemp(){
+      return Temp; 
     }
 };
 
@@ -31,8 +47,8 @@ class DHT : public capteur{
     float Temp;
     float Hum;
   public :
-    DHT();
-    DHT(float T, float H){
+    DHT():capteur("humidite"){};
+    DHT(float T, float H):capteur("humidite"){
       Temp=T;
       Hum=H;
     }
@@ -51,7 +67,7 @@ class CaptCO2 : public capteur{
 
 
 
-
+BHP Pression;
 
 
 
@@ -62,11 +78,18 @@ void setup(){
   while (1) {}
   }
 
+
+  
+  
   
   
   
 }
 
 void loop(){
-  
+ 
+  Pression.setPress();
+  Serial.println(Pression.getPress());
+  Pression.setTemp();
+  Serial.println(Pression.getTemp());
 }
