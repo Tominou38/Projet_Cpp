@@ -1,4 +1,4 @@
-
+ 
 #include <Adafruit_BMP085.h>
 using namespace std; 
 Adafruit_BMP085 bmp;
@@ -198,6 +198,7 @@ void loop(){
   angle=190;
   Pression.setPress();
   Pression.setTemp();
+
   Ecran.setTemp(Pression.getTemp());
   Serial.println(Pression.getPress());
   Servo1.setAngle(angle);
