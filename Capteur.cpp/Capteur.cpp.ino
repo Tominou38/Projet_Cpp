@@ -16,7 +16,7 @@ Servo myservo2;
 int angle = 0;
 
 #include "DHT.h"
-#define DHTPIN 6
+#define DHTPIN 5
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -192,20 +192,28 @@ void setup(){
    myservo2.attach(servoPin2);
 
    dht.begin();
+
+   Servo1.setAngle(0);
 }
 
 void loop(){
   angle=190;
   Pression.setPress();
   Pression.setTemp();
-
+  angle = PresstoAngle(Pression.getPress());
+  Serial.println("Angle :"+String(angle));
   Ecran.setTemp(Pression.getTemp());
   Serial.println(Pression.getPress());
+
+
   Servo1.setAngle(angle);
 
   Humidity.setHumidity();
   Humidity.setTemp();
   Serial.println("Temperature = " + String(Humidity.getTemp())+" °C");
   Serial.println("Humidite = " + String(Humidity.getHumidity())+" %");
+  TemptoAngle(Pression.getTemp());
+  
+  delay(1000);
 
 }
