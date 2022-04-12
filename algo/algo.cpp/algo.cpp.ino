@@ -1,4 +1,4 @@
- 
+
 #include <Adafruit_BMP085.h>
 using namespace std; 
 Adafruit_BMP085 bmp;
@@ -64,6 +64,10 @@ class CaptCO2 : public capteur{
     }
 };
 
+int PresstoAngle(float pression){
+  int pre = (int)pression;
+  return 1;
+};
 
 
 
@@ -92,7 +96,4 @@ void loop(){
   Serial.println(Pression.getPress());
   Pression.setTemp();
   Serial.println(Pression.getTemp());
-  Serial.print( "angle ");
-  Serial.println( PresstoAngle());
- 
 }
