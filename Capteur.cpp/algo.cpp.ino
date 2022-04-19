@@ -43,14 +43,15 @@ int TemptoAngle(float temp){
     angle =0;
   }
   else if (tem >= 4000){
-    angle = 360;
+    angle = 180;
   }
   else{
     angle = 0.06*((float)tem+2000);  
     
   }
   Serial.println(angle);
-  return angle;
+  Serial.println(angle/2);
+  return angle/2;
   
   
 };

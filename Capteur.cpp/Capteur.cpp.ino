@@ -1,3 +1,5 @@
+#include <ArduinoSTL.h>
+
  
 #include <Adafruit_BMP085.h>
 using namespace std; 
@@ -5,6 +7,7 @@ Adafruit_BMP085 bmp;
 #include <Wire.h>
 #include "rgb_lcd.h"
 #include <Servo.h>
+#include <list>
 
 // Create a new servo object:
 Servo myservo;
@@ -31,6 +34,8 @@ const int colorB = 255;
    // DES CLASSES CAPTEUR 
    //-------------------------------
 
+
+// CLASSE MERE 
 class capteur {
   protected : 
     String nom; 
@@ -40,7 +45,7 @@ class capteur {
       nom=n;
     }
 };
-
+// CLASSES FILLES 
 class BHP: public capteur {
   protected : 
     float Temp;
@@ -110,7 +115,7 @@ class CaptCO2 : public capteur{
    //-------------------------------
    // INITIALISATION DES CLASSES AFFICHAGE 
    //-------------------------------
-
+//CLASSE MERE 
 class Affichage {
    protected : 
     String nom; 
@@ -121,6 +126,7 @@ class Affichage {
     }
 };
 
+//CLASSE FILLE 
 class LCD : public Affichage{
   protected :
     String Message;
@@ -154,14 +160,54 @@ class Servomoteur : public Affichage{
 
 
    //-------------------------------
+   // CLASSE TEMPERATURE
+   //-------------------------------
+
+class Temperature {
+  protected :
+    float temp;
+  public :
+    
+    Temperature(){};
+    Temperature(float t){
+      temp=t;
+    };
+    float getTemp(){
+      return(temp);
+    }
+    void setTemp(float t){
+      temp=t;
+    }
+    Temperature & operator +=(const Temperature & autre){
+      temp += autre.temp;
+      return(*this);
+    }
+};
+
+//Temperature operator + (const Temperature & un,const Temperature & deux ) {
+//  return(Temperature(un.getTemp()+deux.getTemp()));
+//}
+
+   //-------------------------------
    // INITIALISATION OBJETS 
    //-------------------------------
 
 BHP Pression;
 LCD Ecran;
+Temperature T1;
+Temperature T2;
+Temperature T3;
 Servomoteur Servo1;
 Servomoteur Servo2;
 DHTCapt Humidity;
+
+
+//LISTE//
+int i;
+list<int>listeTemp;
+list<int>::iterator it;
+float moyenne;
+
 
 
 
@@ -193,7 +239,10 @@ void setup(){
 
    dht.begin();
 
-   Servo1.setAngle(0);
+   //liste 
+   i = 0;
+   listeTemp.push_back(Pression.getTemp());
+  i+=1;
 }
 
 void loop(){
@@ -202,18 +251,41 @@ void loop(){
   Pression.setTemp();
   angle = PresstoAngle(Pression.getPress());
   Serial.println("Angle :"+String(angle));
-  Ecran.setTemp(Pression.getTemp());
+  
+  T1.setTemp(Pression.getTemp());
+  
   Serial.println(Pression.getPress());
 
-
-  Servo1.setAngle(angle);
+  
+  //Servo1.setAngle(angle);
+  
 
   Humidity.setHumidity();
   Humidity.setTemp();
+  T2.setTemp(Humidity.getTemp());
+  T2+=T1;
+  Ecran.setTemp(T2.getTemp()/2);
   Serial.println("Temperature = " + String(Humidity.getTemp())+" °C");
   Serial.println("Humidite = " + String(Humidity.getHumidity())+" %");
   TemptoAngle(Pression.getTemp());
+
+
+  //gestion temp moyenne
+  listeTemp.push_back(Humidity.getTemp());
+  it= listeTemp.begin();
+  moyenne = 0.0;
+  for(it = listeTemp.begin();it !=listeTemp.end(); it++){
+    moyenne = moyenne + *it;
+  }
+   Serial.println("MOYENNE = " + String(moyenne)+" deg");
+  moyenne = moyenne/float(i);
+  i = i+1;
+    Serial.println("MOYENNE = " + String(moyenne)+" deg");
   
+  
+  Servo1.setAngle(angle);
   delay(1000);
+
+  
 
 }
