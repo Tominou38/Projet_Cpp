@@ -26,9 +26,9 @@ DHT dht(DHTPIN, DHTTYPE);
 
 
 rgb_lcd lcd;
-const int colorR = 135;
-const int colorG = 143;
-const int colorB = 255;
+const int colorR = 255;
+const int colorG = 194;
+const int colorB = 0;
 
    //-------------------------------
    // DES CLASSES CAPTEUR 
@@ -208,6 +208,7 @@ list<int>listeTemp;
 list<int>::iterator it;
 float moyenne;
 
+int v=0;
 
 
 
@@ -227,9 +228,9 @@ void setup(){
    //-------------------------------
    lcd.begin(16, 2);
    lcd.setRGB(colorR, colorG, colorB);
-   lcd.print("Il fait : ");
-   lcd.setCursor(9, 1);
-   lcd.print("degre C");
+   
+   //lcd.setCursor(9, 1);
+   //lcd.print("degre C");
   
    //-------------------------------
    // INITIALISATION Servo
@@ -244,6 +245,7 @@ void setup(){
    listeTemp.push_back(Pression.getTemp());
   i+=1;
 }
+
 
 void loop(){
   angle=190;
@@ -264,7 +266,23 @@ void loop(){
   Humidity.setTemp();
   T2.setTemp(Humidity.getTemp());
   T2+=T1;
-  Ecran.setTemp(T2.getTemp()/2);
+  if (v==0) {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Il fait : ");
+    Ecran.setTemp(T2.getTemp()/2);
+    lcd.setCursor(9, 1);
+    lcd.print("degre C");
+    v=1;
+  }else {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("et l'humidite est");
+    Ecran.setTemp(Humidity.getHumidity());
+    lcd.setCursor(6, 1);
+    lcd.print("% ");
+    v=0;
+  }
   Serial.println("Temperature = " + String(Humidity.getTemp())+" °C");
   Serial.println("Humidite = " + String(Humidity.getHumidity())+" %");
   TemptoAngle(Pression.getTemp());
