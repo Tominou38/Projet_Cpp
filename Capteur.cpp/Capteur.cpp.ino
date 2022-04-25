@@ -1,5 +1,5 @@
 #include <ArduinoSTL.h>
-
+#include <iostream>
  
 #include <Adafruit_BMP085.h>
 using namespace std; 
@@ -183,11 +183,12 @@ class Temperature {
       return(*this);
     }
 };
-
-//Temperature operator + (const Temperature & un,const Temperature & deux ) {
-//  return(Temperature(un.getTemp()+deux.getTemp()));
-//}
-
+String chaleur(int t){
+  if (t >= 30){
+    t=40;
+    throw t ;
+  }
+} ;
    //-------------------------------
    // INITIALISATION OBJETS 
    //-------------------------------
@@ -282,6 +283,16 @@ void loop(){
     lcd.setCursor(6, 1);
     lcd.print("% ");
     v=0;
+  }
+  try {
+    String n=chaleur(T2.getTemp()/2);
+  }catch(String mess){
+    lcd.setRGB(255, 0, 0);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("TROP CHAUD");
+    lcd.setCursor(0,2);
+    lcd.print("PLUS DE 30DEG");
   }
   Serial.println("Temperature = " + String(Humidity.getTemp())+" °C");
   Serial.println("Humidite = " + String(Humidity.getHumidity())+" %");
