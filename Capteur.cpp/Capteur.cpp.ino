@@ -1,6 +1,25 @@
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+
+//   PROJET DE C++, Tom JULLIEN & Thomas Boursac 
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+
+
+/*
+Le but de ce projet est de construire une petite station météorologique comprenant plusieurs capteurs ainsi qu'un servomoteur et un écran LCD permettant d'afficher les 
+resultats de la station 
+ */
+
+
+   //-------------------------------
+   // INCLUDES DES BIBLIOTHEQUES 
+   //-------------------------------
+
+
 #include <ArduinoSTL.h>
 #include <iostream>
- 
 #include <Adafruit_BMP085.h>
 using namespace std; 
 Adafruit_BMP085 bmp;
@@ -12,6 +31,7 @@ Adafruit_BMP085 bmp;
 // Create a new servo object:
 Servo myservo;
 Servo myservo2;
+
 // Define the servo pin:
 #define servoPin 2
 #define servoPin2 3
@@ -31,7 +51,7 @@ const int colorG = 194;
 const int colorB = 0;
 
    //-------------------------------
-   // DES CLASSES CAPTEUR 
+   // CREATION DES CLASSES CAPTEUR 
    //-------------------------------
 
 
@@ -74,6 +94,7 @@ class BHP: public capteur {
     }
 };
 
+
 class DHTCapt : public capteur{
   protected : 
     float Temp;
@@ -102,6 +123,7 @@ class DHTCapt : public capteur{
     }
 };
 
+
 class CaptCO2 : public capteur{
   protected : 
     float CO2;
@@ -126,7 +148,7 @@ class Affichage {
     }
 };
 
-//CLASSE FILLE 
+//CLASSES FILLES
 class LCD : public Affichage{
   protected :
     String Message;
@@ -162,7 +184,7 @@ class Servomoteur : public Affichage{
    //-------------------------------
    // CLASSE TEMPERATURE
    //-------------------------------
-
+// cette classe nous permettra d'utiliser la surchage d'un opérateur pour faire la moyenne des 2 températures que nous recupérons
 class Temperature {
   protected :
     float temp;
@@ -183,12 +205,17 @@ class Temperature {
       return(*this);
     }
 };
-String chaleur(int t){
+
+   //-------------------------------
+   // TEST D'EXCEPTION 
+   //-------------------------------
+// Pour utiliser le mécanisme d'exception, nous avons crée une fonction qui teste la température a chaque fois et qui génère un exception en cas de trop forte chaleur. 
+/*String chaleur(int t){
   if (t >= 30){
     t=40;
     throw t ;
   }
-} ;
+} ;*/
    //-------------------------------
    // INITIALISATION OBJETS 
    //-------------------------------
@@ -204,13 +231,19 @@ DHTCapt Humidity;
 
 
 //LISTE//
+// on initialise ici une liste qui récupera toutes les températures et les stockera en utilisant la STL afin d'avoir un suivi de l'evolution de 
+// la température 
 int i;
 list<int>listeTemp;
 list<int>::iterator it;
 float moyenne;
-
 int v=0;
 
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//           VOID SETUP  
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 
 void setup(){
@@ -241,32 +274,45 @@ void setup(){
 
    dht.begin();
 
-   //liste 
+   //-------------------------------
+   // INITIALISATION Liste
+   //-------------------------------
    i = 0;
    listeTemp.push_back(Pression.getTemp());
   i+=1;
 }
 
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//           VOID LOOP  
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 void loop(){
+
   angle=190;
+  // Récupération et inscrption de la pression et de la température dans l'objet Pression.
   Pression.setPress();
   Pression.setTemp();
+
+  // Calcul de l'angle correspondant pour le servo moteur en utilisant algo.cpp 
   angle = PresstoAngle(Pression.getPress());
+  Serial.println(Pression.getPress());
   Serial.println("Angle :"+String(angle));
   
+
+  //Initialisation de la classe Temperature pour ensuite faire la moyenne 
   T1.setTemp(Pression.getTemp());
   
-  Serial.println(Pression.getPress());
-
-  
-  //Servo1.setAngle(angle);
-  
-
+  // Recuperation des données du capteur d'humidité 
   Humidity.setHumidity();
   Humidity.setTemp();
+
+  //Calcul de la moyenne de température des deux capteurs à l'aide d'un opérateur surchargé afin d'obtenir une caleur de température plus précise
   T2.setTemp(Humidity.getTemp());
   T2+=T1;
+
+  // Affichage de l'écran LCD de façon alternée entre la température et l'humidité 
   if (v==0) {
     lcd.clear();
     lcd.setCursor(0,0);
@@ -284,7 +330,9 @@ void loop(){
     lcd.print("% ");
     v=0;
   }
-  try {
+
+  // Gestion du cas ou la température augmente trop 
+  /*try {
     String n=chaleur(T2.getTemp()/2);
   }catch(String mess){
     lcd.setRGB(255, 0, 0);
@@ -293,13 +341,14 @@ void loop(){
     lcd.print("TROP CHAUD");
     lcd.setCursor(0,2);
     lcd.print("PLUS DE 30DEG");
-  }
+  }*/
+
+  // Affichage dans la console des resultats de capteurs 
   Serial.println("Temperature = " + String(Humidity.getTemp())+" °C");
   Serial.println("Humidite = " + String(Humidity.getHumidity())+" %");
   TemptoAngle(Pression.getTemp());
 
-
-  //gestion temp moyenne
+  //Gestion de la liste afin d'obtenir un suivi de la température ainsi qu'une température moyenne au fur et a mesure des mesures
   listeTemp.push_back(Humidity.getTemp());
   it= listeTemp.begin();
   moyenne = 0.0;
@@ -310,11 +359,10 @@ void loop(){
   moyenne = moyenne/float(i);
   i = i+1;
     Serial.println("MOYENNE = " + String(moyenne)+" deg");
-  
-  
+
+  //Envoie de l'angle au servo moteur   
   Servo1.setAngle(angle);
   delay(1000);
 
-  
 
 }
